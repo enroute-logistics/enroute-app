@@ -1,7 +1,9 @@
-import type { UserConfig } from '@commitlint/types'
+// @ts-check
+/** @type {import('@commitlint/types').UserConfig} */
+
 import { RuleConfigSeverity } from '@commitlint/types'
 
-const Configuration: UserConfig = {
+const Configuration = {
   extends: ['@commitlint/config-conventional'],
   rules: {
     'type-enum': [
@@ -44,4 +46,4 @@ const Configuration: UserConfig = {
   helpUrl: 'https://www.conventionalcommits.org/en/v1.0.0',
 }
 
-module.exports = Configuration
+export default Configuration

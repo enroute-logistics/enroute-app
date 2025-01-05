@@ -1,6 +1,6 @@
+import React, { useMemo, JSX } from 'react'
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
 import { useGlobalStore } from '../store/useGlobalStore'
-import { useMemo } from 'react'
 
 const containerStyle = {
   width: '100%',
@@ -12,7 +12,7 @@ const defaultCenter = {
   lng: 38.7636, // Addis Ababa
 }
 
-export const MapView: React.FC = () => {
+export const MapView = (): JSX.Element => {
   const devices = useGlobalStore((state) => state.devices)
   const positions = useGlobalStore((state) => state.positions)
 

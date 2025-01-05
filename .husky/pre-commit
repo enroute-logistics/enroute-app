@@ -5,3 +5,4 @@ if [ "$(git rev-parse --is-inside-rebase 2>/dev/null)" == "true" ] || \
     exit 0
 fi
 
+npx --node-options='--max-old-space-size=8192' eslint .
