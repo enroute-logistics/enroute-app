@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+local_branch_name="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$(git rev-parse --is-inside-rebase 2>/dev/null)" == "true" ] || \
+   [ "$(git rev-parse --abbrev-ref HEAD)" == "HEAD" ]; then
+    exit 0
+fi
+
