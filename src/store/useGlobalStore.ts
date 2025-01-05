@@ -1,11 +1,9 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
-import { login, logout, fetchDevices, getSession, fetchPositions } from '../api/api'
+import { login, logout, fetchDevices, getSession, fetchPositions, fetchGroups } from '../api/api'
 import { connectSocket, closeSocket } from '../api/socket'
-import User from '../types/User'
-import Device from '../types/Device'
-import Position from '../types/Position'
+import { User, Device, Position, Group } from '../types'
 interface GlobalState {
   currentUser: User | null
   loadingUser: boolean
@@ -14,12 +12,15 @@ interface GlobalState {
   error: string | null
   positions: Position[]
   loadingPositions: boolean
+  groups: Group[]
+  loadingGroups: boolean
   // actions
   initializeSession: () => Promise<void>
   doLogin: (email: string, password: string) => Promise<void>
   doLogout: () => Promise<void>
   loadDevices: () => Promise<void>
   loadPositions: () => Promise<void>
+  loadGroups: () => Promise<void>
   initSocket: () => void
   closeSocketConnection: () => void
 }
@@ -33,6 +34,8 @@ export const useGlobalStore = create<GlobalState>()(
     error: null,
     positions: [],
     loadingPositions: true,
+    groups: [],
+    loadingGroups: true,
 
     initializeSession: async (): Promise<void> => {
       try {
@@ -42,6 +45,7 @@ export const useGlobalStore = create<GlobalState>()(
           get().loadDevices()
           get().initSocket()
           get().loadPositions()
+          get().loadGroups()
         } else {
           set({ error: 'Session not found', loadingUser: false })
         }
@@ -59,6 +63,7 @@ export const useGlobalStore = create<GlobalState>()(
         set({ currentUser: user, loadingUser: false, error: null })
         // Optionally, fetch devices upon login
         get().loadDevices()
+        get().loadGroups()
         // Optionally, connect to WebSocket
         get().initSocket()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,6 +105,17 @@ export const useGlobalStore = create<GlobalState>()(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         set({ error: err.message, loadingPositions: false })
+      }
+    },
+
+    loadGroups: async (): Promise<void> => {
+      try {
+        set({ loadingGroups: true })
+        const groups = await fetchGroups()
+        set({ groups, loadingGroups: false })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        set({ error: err.message, loadingGroups: false })
       }
     },
 

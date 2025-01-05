@@ -1,8 +1,6 @@
 import axios from 'axios'
 import moment from 'moment'
-import User from '../types/User'
-import Device from '../types/Device'
-import Position from '../types/Position'
+import { User, Device, Position, Group } from '../types'
 
 // Adjust the baseURL to your Traccar server address
 // For local dev, maybe: baseURL: 'http://localhost:8082/api'
@@ -72,6 +70,13 @@ export async function fetchPositions(): Promise<Position[]> {
   // `/api/positions` GET - get all devices positions
   const response = await instance.get('/positions')
   return response.data // returns array of Position objects
+}
+
+// Fetch groups
+export async function fetchGroups(): Promise<Group[]> {
+  // `/api/groups` GET - get all user’s groups
+  const response = await instance.get('/groups')
+  return response.data // returns array of Group objects
 }
 
 // If you want to use a token approach instead of session cookie,
