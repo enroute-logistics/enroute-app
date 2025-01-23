@@ -122,21 +122,14 @@ export const useGlobalStore = create<GlobalState>()(
     // Initialize WebSocket
     initSocket: (): void => {
       connectSocket((data) => {
-        // data might look like { devices: [...], positions: [...], events: [...] }
         if (data.devices) {
-          // Merge or set new devices
           set({ devices: data.devices })
         }
-        // If we get positions, we might need to merge them into device objects
         if (data.positions) {
-          // handle positions update
-          // e.g. update each device with the new position
           const oldDevices = get().devices
           const updated = oldDevices.map((device) => {
             const newPos = data.positions.find((pos: Position) => pos.deviceId === device.id)
             if (newPos) {
-              // you can store or handle device's position in device's attributes,
-              // or keep it in separate store state
               return {
                 ...device,
                 positionId: newPos.id,

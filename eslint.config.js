@@ -19,7 +19,7 @@ export default [
     languageOptions: {
       parser: tseslintParser,
       parserOptions: {
-        project: ['./tsconfig.json', './tsconfig.app.json', './tsconfig.node.json'],
+        project: ['./tsconfig.json'],
       },
       globals: {
         console: 'readonly',

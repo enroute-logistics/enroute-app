@@ -1,7 +1,9 @@
 import React, { JSX } from 'react'
-import { useGlobalStore } from '../store/useGlobalStore'
-import { DeviceList } from '../components/DeviceList'
-import { MapView } from '../components/MapView'
+
+import { useGlobalStore } from '../../store/useGlobalStore'
+import { DeviceList } from '../../components/DeviceList'
+import { MapView } from '../../components/MapView'
+import classes from './Home.module.less'
 
 export const Home = (): JSX.Element => {
   const doLogout = useGlobalStore((state) => state.doLogout)
@@ -12,10 +14,11 @@ export const Home = (): JSX.Element => {
   }
 
   return (
-    <div>
-      <h2>Welcome, <strong>{currentUser.name}</strong> {groups?.length > 0 ? `at ${groups[0].name}` : ''}</h2>
-      <button onClick={doLogout}>Logout</button>
-      <DeviceList />
+    <div className={classes.home}>
+      <div className={classes.overlay}>
+        <button onClick={doLogout}>Logout</button>
+        <DeviceList />
+      </div>
       <MapView />
     </div>
   )

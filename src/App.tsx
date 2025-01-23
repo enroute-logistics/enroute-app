@@ -1,7 +1,7 @@
 import React, { useEffect, JSX } from 'react'
 import { useGlobalStore } from './store/useGlobalStore'
 import { Login } from './pages/Login'
-import { Home } from './pages/Home'
+import { Home } from './pages/Home/Home'
 
 function App(): JSX.Element {
   const currentUser = useGlobalStore((state) => state.currentUser)
@@ -16,7 +16,7 @@ function App(): JSX.Element {
     return <div>Loading...</div>
   }
 
-  return <div>{!currentUser ? <Login /> : <Home />}</div>
+  return !currentUser ? <Login /> : <Home />
 }
 
 export default App

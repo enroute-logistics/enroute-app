@@ -3,9 +3,12 @@ import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
 import { useGlobalStore } from '../store/useGlobalStore'
 
 const containerStyle = {
-  width: '100%',
-  height: '500px',
-}
+  width: '100vw',
+  height: '100vh',
+  position: 'absolute',
+  top: 0,
+  left: 0,
+} as React.CSSProperties
 
 const defaultCenter = {
   lat: 9.0054,
