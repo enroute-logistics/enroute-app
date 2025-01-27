@@ -1,6 +1,7 @@
 import React, { useMemo, JSX } from 'react'
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
 import { useGlobalStore } from '../store/useGlobalStore'
+import { useTheme } from '@mui/material'
 
 const containerStyle = {
   width: '100vw',
@@ -18,7 +19,7 @@ const defaultCenter = {
 export const MapView = (): JSX.Element => {
   const devices = useGlobalStore((state) => state.devices)
   const positions = useGlobalStore((state) => state.positions)
-
+  const theme = useTheme()
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -39,7 +40,19 @@ export const MapView = (): JSX.Element => {
   }
 
   return (
-    <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
+    <GoogleMap
+      mapContainerStyle={containerStyle}
+      center={center}
+      zoom={10}
+      options={{
+        colorScheme: theme.palette.mode === 'dark' ? 'DARK' : 'LIGHT',
+        cameraControl: false,
+        fullscreenControl: false,
+        mapTypeControl: false,
+        streetViewControl: false,
+        zoomControl: false,
+      }}
+    >
       {devices.map((dev) => {
         const pos = positions.find((pos) => pos.deviceId === dev.id)
         if (!pos) {

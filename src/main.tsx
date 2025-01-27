@@ -8,9 +8,12 @@ import '@fontsource/roboto/700.css'
 
 import './index.css'
 import App from './App'
+import { ThemeProvider } from './providers/ThemeProvider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </StrictMode>,
 )
