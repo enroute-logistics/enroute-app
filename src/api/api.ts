@@ -27,18 +27,8 @@ export async function login(email: string, password: string): Promise<User> {
   })
 
   const generateToken = async (): Promise<void> => {
-    let token = ''
-    try {
-      const expiration = moment().add(6, 'months').toISOString()
-      const response = await instance.post('/session/token', {
-        expiration,
-      })
-      if (response.status === 200) {
-        token = response.data
-      }
-    } catch (error) {
-      token = ''
-    }
+    const expiration = moment().add(6, 'months').toISOString()
+    await instance.post('/session/token', { expiration })
   }
 
   await generateToken()
