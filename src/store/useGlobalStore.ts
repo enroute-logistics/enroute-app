@@ -14,6 +14,7 @@ interface GlobalState {
   loadingPositions: boolean
   groups: Group[]
   loadingGroups: boolean
+  selectedDeviceId: number | null
   // actions
   initializeSession: () => Promise<void>
   doLogin: (email: string, password: string) => Promise<void>
@@ -23,6 +24,7 @@ interface GlobalState {
   loadGroups: () => Promise<void>
   initSocket: () => void
   closeSocketConnection: () => void
+  setSelectedDeviceId: (deviceId: number) => void
 }
 
 export const useGlobalStore = create<GlobalState>()(
@@ -36,7 +38,8 @@ export const useGlobalStore = create<GlobalState>()(
     loadingPositions: true,
     groups: [],
     loadingGroups: true,
-
+    selectedDeviceId: null,
+    setSelectedDeviceId: (deviceId: number): void => set({ selectedDeviceId: deviceId }),
     initializeSession: async (): Promise<void> => {
       try {
         const session = await getSession()
@@ -90,7 +93,7 @@ export const useGlobalStore = create<GlobalState>()(
       try {
         set({ loadingDevices: true })
         const devices = await fetchDevices()
-        set({ devices, loadingDevices: false })
+        set({ devices, loadingDevices: false, selectedDeviceId: devices[0].id })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         set({ error: err.message, loadingDevices: false })

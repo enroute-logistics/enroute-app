@@ -1,5 +1,6 @@
-import React, { JSX } from 'react'
-import { Button, BottomNavigation, BottomNavigationAction } from '@mui/material'
+import React, { JSX, useState } from 'react'
+import { Button } from '@mui/material'
+import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material'
 import { HiViewList, HiLogout } from 'react-icons/hi'
 
 import { useGlobalStore } from '@/store/useGlobalStore'
@@ -8,9 +9,12 @@ import { MapView } from '@/components/MapView'
 import classes from './Home.module.less'
 import useDeviceType from '@/hooks/useDeviceType'
 
+type Nav = 'devices' | 'logout'
+
 export const Home = (): JSX.Element => {
   const doLogout = useGlobalStore((state) => state.doLogout)
   const currentUser = useGlobalStore((state) => state.currentUser)
+  const [selectedNav, setSelectedNav] = useState<Nav>('devices')
   const { isMobile, isTablet } = useDeviceType()
 
   if (!currentUser) {
@@ -20,16 +24,26 @@ export const Home = (): JSX.Element => {
   return isMobile || isTablet ? (
     <div className={classes.home}>
       <div className={classes.overlay}>
-        <DeviceList />
-        <BottomNavigation
-          showLabels
-          value={'home'}
-          onChange={() => {}}
-          className={classes.mobileBottomNavigation}
-        >
-          <BottomNavigationAction label="Devices" icon={<HiViewList />} />
-          <BottomNavigationAction label="Logout" icon={<HiLogout />} onClick={doLogout} />
-        </BottomNavigation>
+        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+          <DeviceList />
+          <BottomNavigation
+            showLabels
+            value={selectedNav}
+            onChange={(event, newValue) => setSelectedNav(newValue)}
+          >
+            <BottomNavigationAction
+              label="Devices"
+              icon={<HiViewList />}
+              value={'devices' as Nav}
+            />
+            <BottomNavigationAction
+              label="Logout"
+              icon={<HiLogout />}
+              onClick={doLogout}
+              value={'logout' as Nav}
+            />
+          </BottomNavigation>
+        </Paper>
       </div>
       <MapView />
     </div>
