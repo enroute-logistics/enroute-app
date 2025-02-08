@@ -1,20 +1,20 @@
 import React, { JSX, useState } from 'react'
-import { Button } from '@mui/material'
 import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material'
-import { HiViewList, HiLogout } from 'react-icons/hi'
+import { HiLogout, HiChartBar, HiTruck } from 'react-icons/hi'
 
 import { useGlobalStore } from '@/store/useGlobalStore'
 import { DeviceList } from '@/components/DeviceList'
 import { MapView } from '@/components/MapView'
 import classes from './Home.module.less'
 import useDeviceType from '@/hooks/useDeviceType'
+import { SideDrawer } from '@/components/SideDrawer/SideDrawer'
 
-type Nav = 'devices' | 'logout'
+type Nav = 'vehicles' | 'logout' | 'reports'
 
 export const Home = (): JSX.Element => {
   const doLogout = useGlobalStore((state) => state.doLogout)
   const currentUser = useGlobalStore((state) => state.currentUser)
-  const [selectedNav, setSelectedNav] = useState<Nav>('devices')
+  const [selectedNav, setSelectedNav] = useState<Nav>('vehicles')
   const { isMobile, isTablet } = useDeviceType()
 
   if (!currentUser) {
@@ -24,17 +24,22 @@ export const Home = (): JSX.Element => {
   return isMobile || isTablet ? (
     <div className={classes.home}>
       <div className={classes.overlay}>
-        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-          <DeviceList />
+        <Paper
+          sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, borderRadius: '0px' }}
+          elevation={3}
+        >
+          {selectedNav === 'vehicles' && <DeviceList />}
           <BottomNavigation
             showLabels
             value={selectedNav}
             onChange={(event, newValue) => setSelectedNav(newValue)}
           >
+            <BottomNavigationAction label="Vehicles" icon={<HiTruck />} value={'vehicles' as Nav} />
             <BottomNavigationAction
-              label="Devices"
-              icon={<HiViewList />}
-              value={'devices' as Nav}
+              label="Reports"
+              icon={<HiChartBar />}
+              value={'reports' as Nav}
+              onClick={() => setSelectedNav('reports')}
             />
             <BottomNavigationAction
               label="Logout"
@@ -50,10 +55,7 @@ export const Home = (): JSX.Element => {
   ) : (
     <div className={classes.home}>
       <div className={classes.overlay}>
-        <Button onClick={doLogout} variant="outlined">
-          Logout
-        </Button>
-        <DeviceList />
+        <SideDrawer />
       </div>
       <MapView />
     </div>

@@ -36,6 +36,10 @@ const theme = createTheme({
             transform: 'translateY(-2px)',
             boxShadow: '0px 4px 15px rgba(0, 82, 212, 0.3)',
           },
+          '&.Mui-selected': {
+            borderRadius: 12,
+            backgroundColor: 'rgba(0, 82, 212, 0.1)',
+          },
         },
       },
     },
