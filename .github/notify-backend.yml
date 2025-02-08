@@ -1,0 +1,18 @@
+name: Notify Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send repository dispatch to backend repo
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          repository: enroute-logistics/enroute-api
+          event-type: frontend-updated
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
