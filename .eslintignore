@@ -4,3 +4,4 @@ dist
 build
 *.d.ts
 vite.config.ts 
+tsconfig.tsbuildinfo
