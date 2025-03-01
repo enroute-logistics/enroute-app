@@ -10,6 +10,7 @@ export default defineConfig(() => ({
       '/api/socket': 'ws://localhost:8082',
       '/api': 'http://localhost:8082',
     },
+    allowedHosts: ['localhost', '127.0.0.1', 'enroute-app-production.up.railway.app'],
   },
   build: {
     outDir: 'build',
