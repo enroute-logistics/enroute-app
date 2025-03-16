@@ -43,7 +43,7 @@ const features = [
   },
 ]
 
-export const Login = (): JSX.Element => {
+export const Signup = (): JSX.Element => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [emailError, setEmailError] = React.useState(false)
@@ -52,12 +52,10 @@ export const Login = (): JSX.Element => {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('')
   const [hasEditedEmail, setHasEditedEmail] = React.useState(false)
   const [hasEditedPassword, setHasEditedPassword] = React.useState(false)
-  const doLogin = useGlobalStore((state) => state.doLogin)
+  const [name, setName] = React.useState('')
+  const [organizationName, setOrganizationName] = React.useState('')
+  const doSignup = useGlobalStore((state) => state.doSignup)
   const navigate = useNavigate()
-
-  const redirectToSignup = (): void => {
-    navigate('/redirect-to-signup')
-  }
 
   const validateEmail = (email: string): boolean => {
     if (!hasEditedEmail) return true
@@ -119,13 +117,15 @@ export const Login = (): JSX.Element => {
       return
     }
     try {
-      await doLogin(email, password)
-      navigate('/')
+      await doSignup({ email, password, name, organization: { name: organizationName } })
     } catch (error) {
-      if (error instanceof Error && error.message === 'Invalid credentials') {
-        setEmailErrorMessage('Invalid email or password')
+      if (error instanceof Error && error.message === 'User already exists') {
+        setEmailErrorMessage('User already exists')
+        navigate('/login')
+      } else if (error instanceof Error) {
+        setEmailErrorMessage(`Error: ${error.message}`)
       } else {
-        setEmailErrorMessage('An error occurred while logging in')
+        setEmailErrorMessage('An unexpected error occurred')
       }
     }
   }
@@ -186,7 +186,7 @@ export const Login = (): JSX.Element => {
 
             <StyledCard>
               <Typography variant="h4" component="h1" gutterBottom>
-                Login
+                Sign up
               </Typography>
               <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
                 <TextField
@@ -219,11 +219,30 @@ export const Login = (): JSX.Element => {
                   helperText={passwordErrorMessage}
                   onBlur={() => setHasEditedPassword(true)}
                 />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="name"
+                  label="Name"
+                  name="name"
+                  autoComplete="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="organizationName"
+                  label="Organization Name"
+                  name="organizationName"
+                  autoComplete="organizationName"
+                  value={organizationName}
+                  onChange={(e) => setOrganizationName(e.target.value)}
+                />
                 <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-                  Sign In
-                </Button>
-                <Button onClick={redirectToSignup} variant="outlined" fullWidth>
-                  Not a member? Sign up
+                  Sign up
                 </Button>
               </Box>
             </StyledCard>

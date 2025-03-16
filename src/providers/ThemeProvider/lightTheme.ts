@@ -1,5 +1,8 @@
 import { createTheme } from '@mui/material/styles'
 
+// Define constants for commonly used values
+const BLUR_EFFECT = 'blur(12px)'
+
 const lightTheme = createTheme({
   palette: {
     mode: 'light',
@@ -36,13 +39,32 @@ const lightTheme = createTheme({
           borderRadius: 12,
           padding: '12px 24px',
           textTransform: 'none',
+          transition: 'all 0.3s ease-in-out',
+        },
+        contained: {
           background: 'linear-gradient(135deg, #007AFF 0%, #9F00C5 100%)',
           color: '#fff',
-          transition: 'all 0.3s ease-in-out',
           '&:hover': {
             transform: 'translateY(-2px)',
             boxShadow: '0px 4px 20px rgba(0, 122, 255, 0.3)',
             background: 'linear-gradient(135deg, #009FFF 0%, #B700F5 100%)',
+          },
+        },
+        outlined: {
+          border: '1px solid #007AFF',
+          color: '#007AFF',
+          background: 'transparent',
+          '&:hover': {
+            borderColor: '#009FFF',
+            color: '#009FFF',
+            background: 'rgba(0, 122, 255, 0.08)',
+            transform: 'translateY(-2px)',
+          },
+        },
+        text: {
+          color: '#007AFF',
+          '&:hover': {
+            background: 'rgba(0, 122, 255, 0.08)',
           },
         },
       },
@@ -86,7 +108,7 @@ const lightTheme = createTheme({
       styleOverrides: {
         paper: {
           background: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(12px)',
+          backdropFilter: BLUR_EFFECT,
           borderRight: '1px solid rgba(0, 0, 0, 0.1)',
         },
       },
@@ -99,7 +121,7 @@ const lightTheme = createTheme({
           background: 'rgba(0, 0, 0, 0.15)',
           color: '#121212',
           fontSize: '0.9rem',
-          backdropFilter: 'blur(8px)',
+          backdropFilter: BLUR_EFFECT,
           borderRadius: '8px',
           padding: '8px 12px',
         },
@@ -138,7 +160,7 @@ const lightTheme = createTheme({
       styleOverrides: {
         paper: {
           background: 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(12px)',
+          backdropFilter: BLUR_EFFECT,
           boxShadow: '0px 5px 20px rgba(0,0,0,0.1)',
           borderRadius: 12,
         },
@@ -162,7 +184,6 @@ const lightTheme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          background: 'rgba(0, 0, 0, 0.05)',
           borderRadius: 10,
           '& input': {
             color: '#121212',
@@ -170,9 +191,7 @@ const lightTheme = createTheme({
           '& label': {
             color: '#5A5A5A',
           },
-          '&:hover': {
-            background: 'rgba(0, 0, 0, 0.1)',
-          },
+          '&:hover': {},
         },
       },
     },

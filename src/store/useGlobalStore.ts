@@ -1,9 +1,13 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
-import { login, logout, fetchDevices, getSession, fetchPositions, fetchGroups } from '../api/api'
-import { connectSocket, closeSocket } from '../api/socket'
-import { User, Device, Position, Group } from '../types'
+import { login, logout, fetchDevices, fetchPositions, getStoredAuthData, signup } from '../api/api'
+import { User, Device, Position } from '@/types'
+import { RegisterDto } from '@/dtos/auth.dto'
+
+// Define constants for duplicate strings
+const USER_EXISTS_ERROR = 'User already exists'
+
 interface GlobalState {
   currentUser: User | null
   loadingUser: boolean
@@ -12,16 +16,14 @@ interface GlobalState {
   error: string | null
   positions: Position[]
   loadingPositions: boolean
-  groups: Group[]
-  loadingGroups: boolean
   selectedDeviceId: number | null
   // actions
   initializeSession: () => Promise<void>
   doLogin: (email: string, password: string) => Promise<void>
   doLogout: () => Promise<void>
+  doSignup: (registerData: RegisterDto) => Promise<void>
   loadDevices: () => Promise<void>
   loadPositions: () => Promise<void>
-  loadGroups: () => Promise<void>
   initSocket: () => void
   closeSocketConnection: () => void
   setSelectedDeviceId: (deviceId: number) => void
@@ -36,25 +38,22 @@ export const useGlobalStore = create<GlobalState>()(
     error: null,
     positions: [],
     loadingPositions: true,
-    groups: [],
-    loadingGroups: true,
     selectedDeviceId: null,
     setSelectedDeviceId: (deviceId: number): void => set({ selectedDeviceId: deviceId }),
     initializeSession: async (): Promise<void> => {
       try {
-        const session = await getSession()
+        const session = getStoredAuthData()
         if (session) {
-          set({ currentUser: session, loadingUser: false, error: null })
+          set({ currentUser: session.user, loadingUser: false, error: null })
           get().loadDevices()
           get().initSocket()
           get().loadPositions()
-          get().loadGroups()
         } else {
           set({ error: 'Session not found', loadingUser: false })
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        set({ error: error.message, loadingUser: false })
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+        set({ error: errorMessage, loadingUser: false })
       }
     },
 
@@ -62,16 +61,15 @@ export const useGlobalStore = create<GlobalState>()(
     doLogin: async (email: string, password: string): Promise<void> => {
       try {
         set({ loadingUser: true, error: null })
-        const user = await login(email, password)
-        set({ currentUser: user, loadingUser: false, error: null })
+        const authResponse = await login(email, password)
+        set({ currentUser: authResponse.user, loadingUser: false, error: null })
         // Optionally, fetch devices upon login
         get().loadDevices()
-        get().loadGroups()
         // Optionally, connect to WebSocket
         get().initSocket()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        set({ error: err.message, loadingUser: false })
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+        set({ error: errorMessage, loadingUser: false })
       }
     },
 
@@ -82,9 +80,29 @@ export const useGlobalStore = create<GlobalState>()(
         await logout()
         set({ currentUser: null, devices: [], loadingUser: false })
         get().closeSocketConnection()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        set({ error: err.message, loadingUser: false })
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+        set({ error: errorMessage, loadingUser: false })
+      }
+    },
+
+    // Sign up user
+    doSignup: async (registerData: RegisterDto): Promise<void> => {
+      try {
+        const authResponse = await signup(registerData)
+        set({ currentUser: authResponse.user, loadingUser: false, error: null })
+        // Optionally, fetch devices upon login
+        get().loadDevices()
+        // Optionally, connect to WebSocket
+        get().initSocket()
+      } catch (err: unknown) {
+        if (err instanceof Error && err.message === USER_EXISTS_ERROR) {
+          set({ error: USER_EXISTS_ERROR, loadingUser: false })
+          throw new Error(USER_EXISTS_ERROR)
+        } else {
+          const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+          set({ error: errorMessage, loadingUser: false })
+        }
       }
     },
 
@@ -93,10 +111,10 @@ export const useGlobalStore = create<GlobalState>()(
       try {
         set({ loadingDevices: true })
         const devices = await fetchDevices()
-        set({ devices, loadingDevices: false, selectedDeviceId: devices[0].id })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        set({ error: err.message, loadingDevices: false })
+        set({ devices, loadingDevices: false, selectedDeviceId: devices[0]?.id })
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+        set({ error: errorMessage, loadingDevices: false })
       }
     },
 
@@ -105,50 +123,19 @@ export const useGlobalStore = create<GlobalState>()(
         set({ loadingPositions: true })
         const positions = await fetchPositions()
         set({ positions, loadingPositions: false })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        set({ error: err.message, loadingPositions: false })
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+        set({ error: errorMessage, loadingPositions: false })
       }
     },
 
-    loadGroups: async (): Promise<void> => {
-      try {
-        set({ loadingGroups: true })
-        const groups = await fetchGroups()
-        set({ groups, loadingGroups: false })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        set({ error: err.message, loadingGroups: false })
-      }
-    },
-
-    // Initialize WebSocket
+    // Placeholder implementations for socket methods
     initSocket: (): void => {
-      connectSocket((data) => {
-        if (data.devices) {
-          set({ devices: data.devices })
-        }
-        if (data.positions) {
-          const oldDevices = get().devices
-          const updated = oldDevices.map((device) => {
-            const newPos = data.positions.find((pos: Position) => pos.deviceId === device.id)
-            if (newPos) {
-              return {
-                ...device,
-                positionId: newPos.id,
-                lastUpdate: newPos.deviceTime,
-              }
-            }
-            return device
-          })
-          set({ devices: updated })
-        }
-      })
+      // Implementation will be added later
     },
 
-    // Close WebSocket
     closeSocketConnection: (): void => {
-      closeSocket()
+      // Implementation will be added later
     },
   })),
 )

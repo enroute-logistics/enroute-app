@@ -25,6 +25,7 @@ export default [
         console: 'readonly',
         window: 'readonly',
         document: 'readonly',
+        localStorage: 'readonly',
       },
     },
     settings: {
