@@ -8,6 +8,12 @@ import { RegisterDto } from '@/dtos/auth.dto'
 // Define constants for duplicate strings
 const USER_EXISTS_ERROR = 'User already exists'
 
+interface Notification {
+  message: string
+  type: 'error' | 'success' | 'info' | 'warning'
+  open: boolean
+}
+
 interface GlobalState {
   currentUser: User | null
   loadingUser: boolean
@@ -17,6 +23,7 @@ interface GlobalState {
   positions: Position[]
   loadingPositions: boolean
   selectedDeviceId: number | null
+  notification: Notification | null
   // actions
   initializeSession: () => Promise<void>
   doLogin: (email: string, password: string) => Promise<void>
@@ -27,6 +34,9 @@ interface GlobalState {
   initSocket: () => void
   closeSocketConnection: () => void
   setSelectedDeviceId: (deviceId: number) => void
+  showNotification: (message: string, type: 'error' | 'success' | 'info' | 'warning') => void
+  hideNotification: () => void
+  clearNotification: () => void
 }
 
 export const useGlobalStore = create<GlobalState>()(
@@ -39,6 +49,7 @@ export const useGlobalStore = create<GlobalState>()(
     positions: [],
     loadingPositions: true,
     selectedDeviceId: null,
+    notification: null,
     setSelectedDeviceId: (deviceId: number): void => set({ selectedDeviceId: deviceId }),
     initializeSession: async (): Promise<void> => {
       try {
@@ -70,6 +81,8 @@ export const useGlobalStore = create<GlobalState>()(
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error'
         set({ error: errorMessage, loadingUser: false })
+        // Show error notification
+        set({ notification: { message: errorMessage, type: 'error', open: true } })
       }
     },
 
@@ -89,6 +102,7 @@ export const useGlobalStore = create<GlobalState>()(
     // Sign up user
     doSignup: async (registerData: RegisterDto): Promise<void> => {
       try {
+        set({ loadingUser: true })
         const authResponse = await signup(registerData)
         set({ currentUser: authResponse.user, loadingUser: false, error: null })
         // Optionally, fetch devices upon login
@@ -102,6 +116,8 @@ export const useGlobalStore = create<GlobalState>()(
         } else {
           const errorMessage = err instanceof Error ? err.message : 'Unknown error'
           set({ error: errorMessage, loadingUser: false })
+          // Show error notification
+          set({ notification: { message: errorMessage, type: 'error', open: true } })
         }
       }
     },
@@ -137,5 +153,17 @@ export const useGlobalStore = create<GlobalState>()(
     closeSocketConnection: (): void => {
       // Implementation will be added later
     },
+
+    showNotification: (
+      message: string,
+      type: 'error' | 'success' | 'info' | 'warning' = 'info',
+    ): void => set({ notification: { message, type, open: true } }),
+
+    hideNotification: (): void =>
+      set((state) =>
+        state.notification ? { notification: { ...state.notification, open: false } } : {},
+      ),
+
+    clearNotification: (): void => set({ notification: null }),
   })),
 )

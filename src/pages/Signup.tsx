@@ -118,6 +118,7 @@ export const Signup = (): JSX.Element => {
     }
     try {
       await doSignup({ email, password, name, organization: { name: organizationName } })
+      navigate('/')
     } catch (error) {
       if (error instanceof Error && error.message === 'User already exists') {
         setEmailErrorMessage('User already exists')

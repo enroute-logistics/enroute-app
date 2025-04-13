@@ -3,6 +3,7 @@ import { useGlobalStore } from './store/useGlobalStore'
 import { Home } from './pages/Home/Home'
 import { LoginSkeleton } from './components/LoginSkeleton'
 import { useNavigate } from 'react-router-dom'
+import { Toast } from './components/Toast/Toast'
 
 function App(): JSX.Element {
   const currentUser = useGlobalStore(({ currentUser }) => currentUser)
@@ -20,10 +21,20 @@ function App(): JSX.Element {
   }, [currentUser, navigate])
 
   if (loadingUser && !currentUser) {
-    return <LoginSkeleton />
+    return (
+      <>
+        <Toast />
+        <LoginSkeleton />
+      </>
+    )
   }
 
-  return <Home />
+  return (
+    <>
+      <Toast />
+      <Home />
+    </>
+  )
 }
 
 export default App

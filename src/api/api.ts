@@ -7,7 +7,7 @@ import { safeLocalStorage } from '@/utils/storage'
 const AUTH_STORAGE_KEY = 'enroute_auth_data'
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3015/api',
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
