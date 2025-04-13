@@ -27,7 +27,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   },
 }))
 
-export const SimpleSignup = (): React.FC => {
+export const SimpleSignup: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
