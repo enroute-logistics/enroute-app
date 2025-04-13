@@ -13,6 +13,7 @@ import { ThemeProvider } from './providers/ThemeProvider/ThemeProvider'
 import { Signup } from './pages/Signup'
 import { Login } from './pages/Login'
 import { RedirectToSignup } from './components/RedirectToSignup'
+import { SimpleSignup } from './pages/SimpleSignup'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -21,6 +22,7 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/signup" element={<SimpleSignup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/redirect-to-signup" element={<RedirectToSignup />} />
           <Route path="*" element={<Navigate to="/" replace />} />
